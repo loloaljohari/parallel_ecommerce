@@ -21,7 +21,7 @@ class StockGuard
                 ->decrement('stock', $quantity);
 
             if ($affected === 0) {
-                Log::channel('aop_console')->error("!!! [REJECTED] Race Condition Blocked - No Stock for Product: " . $productId);
+                Log::channel('aop_console')->error(" [REJECTED] Race Condition Blocked - No Stock for Product: " . $productId);
 
                 return response()->json([
                     'status' => 'error',

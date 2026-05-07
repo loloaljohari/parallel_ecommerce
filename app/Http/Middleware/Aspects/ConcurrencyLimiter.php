@@ -1,4 +1,8 @@
 <?php
+namespace App\Http\Middleware\Aspects;
+
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 class ConcurrencyLimiter
 {
 
@@ -8,7 +12,7 @@ class ConcurrencyLimiter
 
     if ($current > $max) {
         Cache::decrement('active_orders');
-        Log::channel('aop')->warning("Capacity Control: REJECTED (Overload)");
+        Log::channel('aop_console')->warning("Capacity Control: REJECTED (Overload)");
         return response()->json(['message' => 'Server busy, try again later'], 503);
     }
 

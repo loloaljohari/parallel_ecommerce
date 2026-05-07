@@ -16,7 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'aop.log' => \App\Http\Middleware\Aspects\BeforeAfterLogger::class,
             'aop.stock' => \App\Http\Middleware\Aspects\StockGuard::class,
-        ]);
+            'aop.load' => \App\Http\Middleware\Aspects\ConcurrencyLimiter::class,
+
+            ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

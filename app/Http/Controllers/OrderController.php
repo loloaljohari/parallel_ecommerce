@@ -5,39 +5,47 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Products;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\ProcessOrderDetails;
 
 class OrderController extends Controller
 {
     public function store(Request $request)
     {
-        // الـ Middleware (StockGuard) خصم ا
         return DB::transaction(function () use ($request) {
 
             $user = \App\Models\User::first();
-
             if (!$user) {
-                return response()->json(['message' => 'No user found in DB'], 500);
+                return response()->json(['message' => 'User not found'], 500);
+            }
+
+            $totalPrice = 0;
+            if ($request->items) {
+                foreach ($request->items as $item) {
+                    $product = Products::find($item['product_id']);
+                    if ($product) {
+                        $totalPrice += $product->price * $item['quantity'];
+                    }
+                }
             }
 
             $order = $user->orders()->create([
-                'total_price' => $request->items ? array_sum(array_map(function ($item) {
-                    $product = Products::find($item['product_id']);
-                    return $product ? $product->price * $item['quantity'] : 0;
-                }, $request->items)) : 0,
-                'status' => 'completed'
+                'total_price' => $totalPrice,
+                'status' => 'pending'
             ]);
-
 
             foreach ($request->items as $item) {
                 $order->items()->create([
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
-                    'price' => 0
+                    'price' => Products::find($item['product_id'])->price ?? 0
                 ]);
             }
 
+            ProcessOrderDetails::dispatch($order)->afterCommit();
+
             return response()->json([
-                'message' => 'Order stored successfully',
+                'status' => 'success',
+                'message' => 'Order processed and added to queue',
                 'order_id' => $order->id
             ], 201);
         });
