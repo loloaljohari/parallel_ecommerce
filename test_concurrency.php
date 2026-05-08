@@ -1,7 +1,7 @@
 <?php
 $url = "http://127.0.0.1:8000/api/orders";
 $token = "5|21BDPWl1gXYs6hFTJr8IVXa9KMwLEfuOEeUtqPbU940ef5c4";
-$totalRequests = 100;
+$totalRequests = 500;
 
 $multiHandle = curl_multi_init();
 $channels = [];
@@ -40,7 +40,7 @@ $rejectedTimes = [];
 
 foreach ($channels as $channel) {
     $info = curl_getinfo($channel);
-    $time = $info['total_time'] * 1000; 
+    $time = $info['total_time'] * 1000;
     $httpCode = $info['http_code'];
 
     if ($httpCode == 201) {

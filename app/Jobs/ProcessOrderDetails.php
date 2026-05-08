@@ -24,10 +24,10 @@ class ProcessOrderDetails implements ShouldQueue
 
     public function handle()
     {
-        sleep(30);
+        sleep(0.5);
 
        Log::channel('aop_console')->info("Asynchronous Process: Order #{$this->order->id} has been fully processed and notification sent.");
 
-        $this->order->update(['status' => 'processed']);
+        $this->order->update(['status' => 'completed']);
     }
 }
