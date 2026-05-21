@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Products;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\ProcessOrderDetails;
+use Exception;
 
 class OrderController extends Controller
 {
-    public function store(Request $request)
+   public function store(Request $request)
     {
         return DB::transaction(function () use ($request) {
 
@@ -19,12 +20,29 @@ class OrderController extends Controller
             }
 
             $totalPrice = 0;
+            $itemsData = [];
+
             if ($request->items) {
                 foreach ($request->items as $item) {
-                    $product = Products::find($item['product_id']);
-                    if ($product) {
-                        $totalPrice += $product->price * $item['quantity'];
+                    $product = Products::where('id', $item['product_id'])->lockForUpdate()->first();
+
+                    if (!$product) {
+                        throw new Exception("Product ID {$item['product_id']} not found.");
                     }
+
+                    if ($product->stock < $item['quantity']) {
+                        throw new Exception("Insufficient stock for product ID {$item['product_id']}.");
+                    }
+
+                    $totalPrice += $product->price * $item['quantity'];
+
+                    $product->decrement('stock', $item['quantity']);
+
+                    $itemsData[] = [
+                        'product_id' => $item['product_id'],
+                        'quantity' => $item['quantity'],
+                        'price' => $product->price
+                    ];
                 }
             }
 
@@ -33,19 +51,15 @@ class OrderController extends Controller
                 'status' => 'pending'
             ]);
 
-            foreach ($request->items as $item) {
-                $order->items()->create([
-                    'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => Products::find($item['product_id'])->price ?? 0
-                ]);
+            foreach ($itemsData as $data) {
+                $order->items()->create($data);
             }
 
             ProcessOrderDetails::dispatch($order)->afterCommit();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Order processed and added to queue',
+                'message' => 'Order processed safely',
                 'order_id' => $order->id
             ], 201);
         });

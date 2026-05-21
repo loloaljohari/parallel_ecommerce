@@ -2,17 +2,19 @@
 
 namespace App\Jobs;
 
+
 use App\Models\Orders;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-
-
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 class DailySalesAudit implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function handle()
+   public function handle(): void
     {
         $totalSales = 0;
         $orderCount = 0;

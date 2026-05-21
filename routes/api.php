@@ -12,6 +12,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::post('/orders', [OrderController::class, 'store'])
-     ->middleware(['aop.log', 'aop.stock']);
+     ->middleware(['aop.log', 'aop.stock',]);
     Route::get('/orders', [OrderController::class, 'userOrders']);
 });
