@@ -1,0 +1,15 @@
+php artisan project:stress-test --requests=200 --endpoint=/api/orders --token="2|fUa3cxGxKy0aRN3rRXz1yFUlYSeBFuVYhbabwKJX4cd53547" --product-id=1 --quantity=5
+php artisan optimize:clear
+php artisan migrate:fresh
+php artisan project:load-distribution --tasks=5
+php artisan project:benchmark --runs=10 --endpoint=/api/products
+
+
+php artisan serve --host=127.0.0.1 --port=8003
+php artisan serve --host=127.0.0.1 --port=8002
+php artisan serve --host=127.0.0.1 --port=8001
+php artisan serve --host=127.0.0.1 --port=8000
+ php artisan serve 
+
+php artisan schedule:work
+php artisan schedule:run
