@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\Order;
 use App\Models\Orders;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -15,19 +14,17 @@ class ProcessOrderDetails implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $order;
+    public Orders $order;
 
     public function __construct(Orders $order)
     {
         $this->order = $order;
     }
 
-    public function handle()
+    public function handle(): void
     {
-        sleep(1);
-
-       Log::channel('aop_console')->info("Asynchronous Process: Order #{$this->order->id} has been fully processed and notification sent.");
-
         $this->order->update(['status' => 'completed']);
+
+        Log::info("Asynchronous Process: Order #{$this->order->id} completed and notification sent.");
     }
 }
