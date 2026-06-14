@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,12 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'aop.log' => \App\Http\Middleware\Aspects\BeforeAfterLogger::class,
             'aop.stock' => \App\Http\Middleware\Aspects\StockGuard::class,
             'aop.load' => \App\Http\Middleware\Aspects\ConcurrencyLimiter::class,
-
-            ]);
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
-
-
-
