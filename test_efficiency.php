@@ -1,6 +1,6 @@
 <?php
 $url = "http://127.0.0.1:8000/api/orders";
-$token = "5|21BDPWl1gXYs6hFTJr8IVXa9KMwLEfuOEeUtqPbU940ef5c4";
+$token = "2|Xp4kOiHlPbd3ehuiffdZrIqoxqvwnl8bphZD4znja8050983";
 $totalRequests = 200;
 $results = [];
 
@@ -11,7 +11,7 @@ for ($i = 0; $i < $totalRequests; $i++) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-        'items' => [['product_id' => 2, 'quantity' => 1]]
+        'items' => [['product_id' => 1, 'quantity' => 1]]
     ]));
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
