@@ -74,13 +74,20 @@ class ProductController extends Controller
         );
 
         $durationMs = round((microtime(true) - $startedAt) * 1000, 2);
+        $this-> writeToConsole(sprintf(
+            '[PRODUCT][INDEX] cache_hit=%s duration_ms=%s count=%d',
+            $cacheHit ? 'true' : 'false',
+            $durationMs,
+            $products->count()
+                ));
 
-        Log::info(
-            'Products index ' . ($cacheHit ? 'cache hit' : 'cache miss'),
-            [
-                'duration_ms' => $durationMs,
-            ]
-        );
+
+        // Log::info(
+        //     'Products index ' . ($cacheHit ? 'cache hit' : 'cache miss'),
+        //     [
+        //         'duration_ms' => $durationMs,
+        //     ]
+        // );
 
         return response()->json([
             'status' => 'success',
@@ -113,5 +120,13 @@ class ProductController extends Controller
             'status' => 'success',
             'data' => $product,
         ], 200);
+    }
+     private function writeToConsole(string $message): void
+    {
+        if (defined('STDOUT')) {
+            fwrite(STDOUT, $message . PHP_EOL);
+        } else {
+            error_log($message);
+        }
     }
 }
